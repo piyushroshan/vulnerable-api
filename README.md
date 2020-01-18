@@ -1,12 +1,14 @@
 # What is vAPI
 
+![https://github.com/jorritfolmer/vulnerable-api/workflows/vAPI/badge.svg](https://github.com/jorritfolmer/vulnerable-api/workflows/vAPI/badge.svg)
+
 vAPI is an API written specifically to illustrate common API vulnerabilities.
-It is implemented using the Bottle Python Framework and consists of a user database and a token database.
+It is implemented using Python Flask + Connexion and consists of a user database and a token database.
 
 ## How is this version different from all the other vulnerable-API forks on GitHub?
 
-1. Python 3 supported
-1. OpenAPI first, ported to [Connexion](https://github.com/zalando/connexion)
+1. Python 3.5, 3.6, 3.7 and 3.8 supported.
+1. OpenAPI first, using [Connexion](https://github.com/zalando/connexion)
 1. Includes tests and an [OpenAPI 3 fuzzer](https://github.com/jorritfolmer/openapi3-fuzzer)
 1. It adds a business relevant widget reservation endpoint.
 1. It adds basic application logging (vAPI.log) for purple teaming demo purposes! 

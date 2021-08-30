@@ -17,7 +17,7 @@ import sqlite3
 import json
 import hashlib
 import time
-import os
+import subprocess
 import re
 import xml.etree.ElementTree as ET
 import logging
@@ -162,7 +162,7 @@ def get_user(user):
     try:
         conn = sqlite3.connect('vAPI.db')
         c = conn.cursor()
-        user_query = "SELECT * FROM users WHERE id = '%s'" % (user)
+        user_query = "SELECT * FROM users WHERE username = '%s'" % (user)
         c.execute(user_query)
         user_record = c.fetchone()
         token_query = "SELECT * FROM tokens WHERE token = '%s'" % (str(token))
@@ -172,21 +172,16 @@ def get_user(user):
     except Exception:
         return {"error": "database error"}, 500
     response = {}
+    print(user_record, token_record)
     # you'll notice we don't actually check the token expiration date
     if isinstance(token_record, tuple):
         if isinstance(user_record, tuple):
-            if token_record[2] == user_record[0]:
-                response['user'] = {}
-                response['user']['id'] = user_record[0]
-                response['user']['name'] = user_record[1]
-                response['user']['password'] = user_record[2]
-                logging.info("app=vAPI:user src_ip=%s user=%s action=success signature=\"Requesting user record: success for user record %s\"" % (src_ip, token_record[2], user))
-                return response, 200
-            else:
-                response['error'] = {
-                    'message': 'the token and user do not match!'}
-                logging.info("app=vAPI:user src_ip=%s user=%s action=failure signature=\"Requesting user record: no permission to show user=%s\"" % (src_ip, token_record[2], user))
-                return response, 403
+            response['user'] = {}
+            response['user']['id'] = user_record[0]
+            response['user']['name'] = user_record[1]
+            response['user']['password'] = user_record[2]
+            logging.info("app=vAPI:user src_ip=%s user=%s action=success signature=\"Requesting user record: success for user record %s\"" % (src_ip, token_record[2], user))
+            return response, 200
         else:
             response['error'] = {'message': 'user id ' + user + ' not found'}
             logging.info("app=vAPI:user src_ip=%s user=%s action=failure signature=\"Requesting user record: failed for unknown user %s\"" % (src_ip, "", user))
@@ -212,7 +207,7 @@ def create_user():
         name = data.get('username','')
         password = data.get('password','')
         # catastrophically bad regex
-        match = "([a-z]+)*[0-9]"
+        match = "([a-z]+)*[0-9]*"
         m = re.search(match, name)
         if m:
             user_query = "SELECT * FROM users WHERE username = '%s'" % (name)
@@ -241,18 +236,24 @@ def create_user():
         logging.info("app=vAPI:user src_ip=%s action=failure signature=\"Create new user: authentication failed, invalid token\"" % src_ip)
         return response, 401
 
-def display_uptime():
-    return display_uptime_flag(False)
+def display_hostname():
+    return display_hostname_flag(False)
 
-def display_uptime_flag(flag):
+def display_hostname_flag(flag):
     src_ip=connexion.request.environ.get('HTTP_X_FORWARDED_FOR') or connexion.request.environ.get('REMOTE_ADDR')
     if flag:
-        command = "uptime -" + flag
-        logging.info("app=vAPI:uptime src_ip=%s action=success signature=\"Uptime request: flag=%s\"" % (src_ip, flag))
+        command = "hostname -" + flag
+        logging.info("app=vAPI:hostname src_ip=%s action=success signature=\"hostname request: flag=%s\"" % (src_ip, flag))
     else:
-        command = "uptime" 
-        logging.info("app=vAPI:uptime src_ip=%s action=success signature=\"Uptime request\"" % src_ip) 
-    output = os.popen(command).read() 
+        command = "hostname" 
+        logging.info("app=vAPI:hostname src_ip=%s action=success signature=\"hostname request\"" % src_ip) 
+    output = subprocess.run(
+                 command,
+                 stdout=subprocess.PIPE,
+                 stderr=subprocess.STDOUT,
+                 shell=True,
+                 encoding='utf-8'
+             ).stdout
     response = {'response':
         {
               'command': command,

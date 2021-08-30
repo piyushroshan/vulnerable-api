@@ -86,12 +86,8 @@ Also contained in this repo is the API specification file to load in e.g. Burp o
 $ curl -X POST -H "Content-type: application/json" http://localhost:8081/tokens \
 -d '
 {
-  "auth": {
-    "passwordCredentials": {
-      "username":"user1",
-      "password":"pass1"
-      }
-  }
+  "username":"user1",
+  "password":"pass1"
 }'
 ````
 
@@ -102,8 +98,8 @@ POST /widget HTTP/1.1
 Content-Type: application/json
 X-Auth-Token: USER TOKEN
 
-{"widget":
-    {"name": "widget01"}
+{
+  "name": "widget01"
 }
 ```
 
@@ -115,16 +111,21 @@ POST /user HTTP/1.1
 Content-type: application/json
 X-Auth-Token: ADMIN TOKEN
 
-{"user":
-	{"username": "user",
-	"password": "pass"}
+{
+  "username": "user",
+  "password": "pass"
 }
 ```
 
 ## Docker
 
+### Build yourself
 1. `docker build -t vapi .`
 1. `docker run -p 8081:8081 vapi`
+
+
+### Or use prebuilt image
+1. `docker run --rm -p 8081:8081 piyushroshan/vulnerable-api` 
 
 ## Testing
 

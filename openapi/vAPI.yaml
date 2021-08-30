@@ -144,10 +144,10 @@ paths:
           description: Unauthenticated
         '403':
           description: Unauthorized
-  /uptime:
+  /hostname:
     get:
       x-openapi-router-controller: vAPI
-      operationId: display_uptime
+      operationId: display_hostname
       description: Auto generated using Swagger Inspector
       responses:
         '200':
@@ -157,17 +157,17 @@ paths:
               schema:
                 type: string
               examples: {}
-  /uptime/{flag}:
+  /hostname/{flag}:
     get:
       x-openapi-router-controller: vAPI
-      operationId: display_uptime_flag
+      operationId: display_hostname_flag
       parameters:
         - in: path
           name: flag
           required: true
           schema: 
             type: string
-      description: Flag for uptime
+      description: Flag for hostname
       responses:
         '200':
           description: Auto generated using Swagger Inspector
